@@ -1,5 +1,11 @@
 from app.models.course import Course
 
+from app.models.course import Course
+from app.models.requirement import (
+    AndRequirement,
+    CourseRequirement,
+    OrRequirement,
+)
 
 def test_create_course():
     course = Course(
@@ -20,3 +26,26 @@ def test_courses_are_equal():
     second = Course("ECS 36C", "Data Structures", 4)
 
     assert first == second
+
+def test_course_with_prerequisites():
+    prerequisites = AndRequirement(
+        requirements=(
+            OrRequirement(
+                requirements=(
+                    CourseRequirement("ECS 20"),
+                    CourseRequirement("MAT 108"),
+                )
+            ),
+            CourseRequirement("ECS 36B"),
+        )
+    )
+
+    course = Course(
+        code="TEST 100",
+        name="Test Course",
+        units=4,
+        prerequisites=prerequisites,
+    )
+
+    assert course.prerequisites == prerequisites
+    assert isinstance(course.prerequisites, AndRequirement)
