@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from app.models.requirement import (
     AndRequirement,
     CourseRequirement,
@@ -5,25 +7,57 @@ from app.models.requirement import (
     Requirement,
 )
 
-from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class EvaluationResult:
     satisfied: bool
-    missing_courses: tuple[str, ...] = ()
+    missing: Requirement | None = None
+
 
 def evaluate(
     requirement: Requirement,
     completed_courses: set[str],
 ) -> EvaluationResult:
+    """Return satisfaction and the remaining prerequisite tree without flattening it."""
     if isinstance(requirement, CourseRequirement):
         if requirement.course_code in completed_courses:
             return EvaluationResult(satisfied=True)
 
         return EvaluationResult(
             satisfied=False,
-            missing_courses=(requirement.course_code,),
+            missing=requirement,
         )
+
+    if isinstance(requirement, AndRequirement):
+        missing = []
+        for child in requirement.requirements:
+            result = evaluate(child, completed_courses)
+            if result.missing is not None:
+                missing.append(result.missing)
+
+        if not missing:
+            return EvaluationResult(satisfied=True)
+        return EvaluationResult(
+            satisfied=False,
+            missing=AndRequirement(tuple(missing)),
+        )
+
+    if isinstance(requirement, OrRequirement):
+        missing = []
+        for child in requirement.requirements:
+            result = evaluate(child, completed_courses)
+            if result.satisfied:
+                return EvaluationResult(satisfied=True)
+            if result.missing is not None:
+                missing.append(result.missing)
+
+        return EvaluationResult(
+            satisfied=False,
+            missing=OrRequirement(tuple(missing)),
+        )
+
+    raise TypeError(f"Unsupported requirement type: {type(requirement)}")
+
 
 def is_satisfied(
     requirement: Requirement,
@@ -45,4 +79,3 @@ def is_satisfied(
         )
 
     raise TypeError(f"Unsupported requirement type: {type(requirement)}")
-
