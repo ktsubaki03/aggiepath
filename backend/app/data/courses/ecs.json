@@ -1,0 +1,57 @@
+[
+  {
+    "code": "ECS SAMPLE 1",
+    "name": "Sample: No Prerequisites",
+    "units": 4,
+    "description": "Synthetic test catalog data; not official UC Davis course information.",
+    "prerequisites": null
+  },
+  {
+    "code": "ECS SAMPLE 2",
+    "name": "Sample: Single Prerequisite",
+    "units": 4,
+    "prerequisites": {"type": "course", "course_code": "ECS 20"}
+  },
+  {
+    "code": "ECS SAMPLE 3",
+    "name": "Sample: AND Prerequisites",
+    "units": 4,
+    "prerequisites": {
+      "type": "and",
+      "requirements": [
+        {"type": "course", "course_code": "ECS 20"},
+        {"type": "course", "course_code": "ECS 36B"}
+      ]
+    }
+  },
+  {
+    "code": "ECS SAMPLE 4",
+    "name": "Sample: OR Prerequisites",
+    "units": 4,
+    "prerequisites": {
+      "type": "or",
+      "requirements": [
+        {"type": "course", "course_code": "ECS 20"},
+        {"type": "course", "course_code": "MAT 108"}
+      ]
+    }
+  },
+  {
+    "code": "ECS SAMPLE 5",
+    "name": "Sample: Nested Prerequisites",
+    "units": 4,
+    "prerequisites": {
+      "type": "and",
+      "requirements": [
+        {
+          "type": "or",
+          "requirements": [
+            {"type": "course", "course_code": "ECS 20"},
+            {"type": "course", "course_code": "MAT 108"}
+          ]
+        },
+        {"type": "course", "course_code": "ECS 36B"}
+      ]
+    }
+  }
+]
